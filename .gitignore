@@ -1,6 +1,6 @@
 .env
 db/
-pyvenv.cfg
-Scripts/
-Include/
-Lib/
+src/Scripts
+src/Lib
+src/Include
+src/pyvenv.cfg

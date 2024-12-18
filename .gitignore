@@ -1,1 +1,6 @@
 .env
+db/
+src/Scripts
+src/Lib
+src/Include
+src/pyvenv.cfg

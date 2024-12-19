@@ -33,6 +33,11 @@ async def on_ready():
 async def alarm():
     data = await get_accounts()
     time = datetime.now(timezone(timedelta(hours=9))).strftime("%H:%M")
+    if time == "06:00":
+        for id in data:
+            data[id]['today'] = False
+        await write_accounts(data)
+        
     for id, account in data.items():
         if account['today'] == True:
             continue
@@ -62,7 +67,7 @@ async def alarm():
                         await write_accounts(data)
                 else:
                     user = bot.get_user(int(id))
-                    await user.send(f"오늘 문제를 안푸셨어요! 오늘 풀면 **{streak['currentStreak']}**일차!")
+                    await user.send(f"오늘 문제를 안푸셨어요! 오늘 풀면 **{streak['currentStreak']+1}**일차!")
             except Exception as e:
                 print(e)
                 continue

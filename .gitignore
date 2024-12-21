@@ -3,4 +3,5 @@ db/
 src/Scripts
 src/Lib
 src/Include
+src/__pycache__
 src/pyvenv.cfg

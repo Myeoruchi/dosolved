@@ -1,9 +1,12 @@
 import asyncio
 import aiofiles
 import json
+import shutil
 from pathlib import Path
+from datetime import datetime, timezone, timedelta
 
 DB_PATH = Path("./../db/user.json")
+BACKUP_PATH = "./../db/backup/"
 FILE_LOCK = asyncio.Lock()
 
 async def get_accounts() -> dict:
@@ -40,3 +43,12 @@ async def write_accounts(accounts: dict) -> None:
 
     except Exception as e:
         print(f"Error occurred in write_accounts: {e}")
+
+async def generate_backup() -> None:
+    today = datetime.now(timezone(timedelta(hours=3))).date()
+    path = f"{BACKUP_PATH + today}.json"
+    if DB_PATH.is_file():
+        shutil.copy(DB_PATH, f"{BACKUP_PATH + today}.json")
+    else:
+        async with aiofiles.open(path, 'w', encoding='utf8') as f:
+            await f.write(json.dumps({}, indent=4, ensure_ascii=False))

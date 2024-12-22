@@ -13,7 +13,7 @@ class Alarm(commands.Cog):
     alarm_group = app_commands.Group(name="알람", description="알람 명령어입니다.")
     @alarm_group.command(name="등록")
     @app_commands.rename(time="시각")
-    async def add_alarm(self, interaction: discord.Interaction, time: str):
+    async def add_alarm(self, interaction: discord.Interaction, time: str) -> None:
         """스트릭 알람을 등록합니다. 봇이랑 같은 서버에 있어야 합니다.
 
         Parameters
@@ -43,7 +43,7 @@ class Alarm(commands.Cog):
         await interaction.followup.send(f"**{time}**에 알람이 등록되었습니다.")
 
     @alarm_group.command(name="목록")
-    async def show_alarm(self, interaction: discord.Interaction):
+    async def show_alarm(self, interaction: discord.Interaction) -> None:
         """등록된 알람 목록을 보여줍니다."""
 
         await interaction.response.defer()
@@ -71,7 +71,7 @@ class Alarm(commands.Cog):
         await interaction.followup.send(embed=embed)
 
     @alarm_group.command(name="초기화")
-    async def reset_alarm(self, interaction: discord.Interaction):
+    async def reset_alarm(self, interaction: discord.Interaction) -> None:
         """등록된 알람을 초기화합니다."""
 
         await interaction.response.defer()
@@ -89,13 +89,14 @@ class Alarm(commands.Cog):
         await interaction.followup.send("알람 목록이 초기화되었습니다.")
 
     @tasks.loop(minutes=1)
-    async def alarm(self):
+    async def alarm(self) -> None:
         data = await database.get_accounts()
         time = datetime.now(timezone(timedelta(hours=9))).strftime("%H:%M")
         if time == "06:00":
             for id in data:
                 data[id]['today'] = False
             await database.write_accounts(data)
+            await database.generate_backup()
             
         for id, account in data.items():
             if account['today'] == True:
@@ -126,5 +127,5 @@ class Alarm(commands.Cog):
                     print(f"알람 중 오류 발생: {e}")
                     continue
     
-async def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Alarm(bot))

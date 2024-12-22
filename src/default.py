@@ -48,7 +48,7 @@ class DefaultCommand(commands.Cog):
         """봇의 명령어 목록을 보여줍니다."""
         await self.show_command_list(interaction)
 
-    async def button_callback(self, interaction: discord.Interaction):
+    async def button_callback(self, interaction: discord.Interaction) -> None:
         if interaction.data['custom_id'] == "show_command_list":
             await self.show_command_list(interaction)
     
@@ -72,5 +72,5 @@ class DefaultCommand(commands.Cog):
         
         await interaction.response.send_message(embed=embed)
     
-async def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(DefaultCommand(bot))

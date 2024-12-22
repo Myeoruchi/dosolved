@@ -65,8 +65,7 @@ class DefaultCommand(commands.Cog):
         embed.add_field(name="/계정 등록", value="Solved.ac 계정을 등록합니다.", inline=False)
         embed.add_field(name="/계정 해지", value="등록된 계정을 해지합니다.", inline=False)
         embed.add_field(name="/스트릭 조회", value="계정의 스트릭 상태를 조회합니다.", inline=False)
-        embed.add_field(name="/알람 등록", value="""스트릭 알람을 등록합니다.
-                                                    봇이랑 같은 서버에 있어야 합니다.""", inline=False)
+        embed.add_field(name="/알람 등록", value="스트릭 알람을 등록합니다.\n봇이랑 같은 서버에 있어야 합니다.", inline=False)
         embed.add_field(name="/알람 목록", value="등록된 알람 목록을 보여줍니다.", inline=False)
         embed.add_field(name="/알람 초기화", value="등록된 알람을 초기화합니다.", inline=False)
         

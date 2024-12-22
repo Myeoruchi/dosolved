@@ -23,7 +23,7 @@ async def get_accounts() -> dict:
                 return json.loads(data)
          
     except Exception as e:
-        print("Error occurred in get_accounts: {e}")
+        print(f"Error occurred in get_accounts: {e}")
         return {}
         
 async def write_accounts(accounts: dict) -> None:
@@ -39,4 +39,4 @@ async def write_accounts(accounts: dict) -> None:
                 await f.write(json.dumps(accounts, indent=4, ensure_ascii=False))
 
     except Exception as e:
-        print("Error occurred in write_accounts: {e}")
+        print(f"Error occurred in write_accounts: {e}")

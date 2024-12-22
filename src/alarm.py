@@ -1,5 +1,6 @@
 import discord
-from data import get_accounts, write_accounts
+import api
+import database
 from datetime import datetime, timezone, timedelta
 from discord import app_commands
 from discord.ext import commands, tasks
@@ -28,7 +29,7 @@ class Alarm(commands.Cog):
         except:
             return await interaction.followup.send(f"**{time}**은 유효한 시각이 아닙니다. 올바른 형식은 HH:MM입니다.")
         
-        data = await get_accounts()
+        data = await database.get_accounts()
         id = str(interaction.user.id)
         if id not in data:
             return await interaction.followup.send("등록된 계정이 없습니다.")
@@ -37,7 +38,7 @@ class Alarm(commands.Cog):
         
         data[id]['alarm'].append(time)
         data[id]['alarm'] = sorted(data[id]['alarm'])
-        await write_accounts(data)
+        await database.write_accounts(data)
 
         await interaction.followup.send(f"**{time}**에 알람이 등록되었습니다.")
 
@@ -47,7 +48,7 @@ class Alarm(commands.Cog):
 
         await interaction.response.defer()
 
-        data = await get_accounts()
+        data = await database.get_accounts()
         id = str(interaction.user.id)
         if id not in data:
             return await interaction.followup.send("등록된 계정이 없습니다.")
@@ -75,7 +76,7 @@ class Alarm(commands.Cog):
 
         await interaction.response.defer()
         
-        data = await get_accounts()
+        data = await database.get_accounts()
         id = str(interaction.user.id)
         if id not in data:
             return await interaction.followup.send("등록된 계정이 없습니다.")
@@ -83,18 +84,18 @@ class Alarm(commands.Cog):
             return await interaction.followup.send("등록된 알람이 없습니다.")
         
         data[id]['alarm'] = []
-        await write_accounts(data)
+        await database.write_accounts(data)
 
         await interaction.followup.send("알람 목록이 초기화되었습니다.")
 
     @tasks.loop(minutes=1)
     async def alarm(self):
-        data = await get_accounts()
+        data = await database.get_accounts()
         time = datetime.now(timezone(timedelta(hours=9))).strftime("%H:%M")
         if time == "06:00":
             for id in data:
                 data[id]['today'] = False
-            await write_accounts(data)
+            await database.write_accounts(data)
             
         for id, account in data.items():
             if account['today'] == True:
@@ -102,9 +103,7 @@ class Alarm(commands.Cog):
 
             if time in account['alarm']:
                 try:
-                    streak_response = await self.bot.session.get(f"https://solved.ac/api/v3/user/grass?handle={account['account']}&topic=default")
-                    streak = await streak_response.json()
-                    
+                    streak = await api.get_streak(self.bot.session, account['account'])
                     streak_list = sorted(streak['grass'], key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d').date(), reverse=True)
                     today = datetime.now(timezone(timedelta(hours=3))).date()
                     check = False
@@ -118,7 +117,7 @@ class Alarm(commands.Cog):
                     if check:
                         if account['today'] == False:
                             data[id]['today'] = True
-                            await write_accounts(data)
+                            await database.write_accounts(data)
                     else:
                         user = self.bot.get_user(int(id))
                         await user.send(f"오늘 문제를 안푸셨어요! 오늘 풀면 **{streak['currentStreak']+1}**일차!")

@@ -2,7 +2,8 @@ import io
 import discord
 import aiofiles
 import asyncio
-from data import get_accounts, write_accounts
+import database
+import api
 from datetime import datetime, timezone, timedelta
 from discord import app_commands
 from discord.ext import commands
@@ -14,7 +15,7 @@ class Streak(commands.Cog):
     streak_group = app_commands.Group(name="스트릭", description="스트릭 명령어 그룹입니다.")
     @streak_group.command(name="조회", description="계정의 스트릭 상태를 조회합니다.")
     @app_commands.rename(account="계정")
-    async def streak(self, interaction: discord.Interaction, account: str | None):
+    async def streak(self, interaction: discord.Interaction, account: str | None) -> None:
         """계정의 스트릭 상태를 조회합니다.
         
         Parameters
@@ -26,34 +27,31 @@ class Streak(commands.Cog):
         await interaction.response.defer()
 
         if account == None:
-            data = await get_accounts()
+            data = await database.get_accounts()
             id = str(interaction.user.id)
             if id not in data:
                 return await interaction.followup.send("등록된 계정이 없습니다.")
             
             account = data[id]['account']
 
-        try:
-            responses = await asyncio.gather(
-                self.bot.session.get(f"https://solved.ac/api/v3/user/grass?handle={account}&topic=default"),
-                self.bot.session.get(f"https://solved.ac/api/v3/user/show?handle={account}")
-            )
-
-            streak_response = responses[0]
-            user_response = responses[1]
-
-            if streak_response.status == 404:
+        responses = await asyncio.gather(
+            api.get_streak(self.bot.session, account),
+            api.get_user(self.bot.session, account)
+        )
+        
+        if isinstance(responses[0], str) or isinstance(responses[1], str):
+            if responses[0] == "NOT_EXIST":
                 return await interaction.followup.send("해당 계정을 찾을 수 없습니다.")
-            
-            streak = await streak_response.json()
-            user = await user_response.json()
-            background_response = await self.bot.session.get(f"https://solved.ac/api/v3/background/show?backgroundId={user['backgroundId']}")
-            background = (await background_response.json())['backgroundImageUrl']
-
-        except Exception as e:
-            print(f"API 요청 중 오류 발생: {e}")
             return await interaction.followup.send("오류가 발생했습니다. 다시 시도해주세요.")
+        
+        streak = responses[0]
+        user = responses[1]
 
+        response = api.get_background(self.bot.session, user['backgroundId'])
+        if isinstance(response, str):
+            return await interaction.followup.send("오류가 발생했습니다. 다시 시도해주세요.")
+        
+        background = response['backgroundImageUrl']
         streak_list = sorted(streak['grass'], key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d').date(), reverse=True)
         curStreak = streak['currentStreak']
         maxStreak = streak['longestStreak']
@@ -70,11 +68,11 @@ class Streak(commands.Cog):
                 break
         
         if check:
-            data = await get_accounts()
+            data = await database.get_accounts()
             id = str(interaction.user.id)
             if id in data and not data[id]['today']:
                 data[id]['today'] = True
-                await write_accounts(data)
+                await database.write_accounts(data)
 
         async with aiofiles.open(f"./../resource/tier/{tier}.png", 'rb') as f:
             data = await f.read()
@@ -93,5 +91,5 @@ class Streak(commands.Cog):
         
         await interaction.followup.send(file=file, embed=embed)
     
-async def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Streak(bot))

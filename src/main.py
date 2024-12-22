@@ -1,7 +1,7 @@
 import os
-import aiohttp
 import discord
 from discord.ext import commands
+from aiohttp import ClientSession
 from dotenv import load_dotenv
 
 class StreakBot(commands.AutoShardedBot):
@@ -15,7 +15,7 @@ class StreakBot(commands.AutoShardedBot):
         self.session = None
 
     async def setup_hook(self):
-        self.session = aiohttp.ClientSession()
+        self.session = ClientSession()
         await self.load_extension("default")
         await self.load_extension("account")
         await self.load_extension("streak")

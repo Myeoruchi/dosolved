@@ -27,7 +27,7 @@ class Account(commands.Cog):
         if id in data:
             return await interaction.followup.send(f"이미 **{data[id]['account']}**로 계정이 등록되어 있습니다.")
         
-        response = api.get_user(self.bot.session, account)
+        response = await api.get_user(self.bot.session, account)
         if isinstance(response, str):
             if response == "NOT_EXIST":
                 return await interaction.followup.send("해당 계정을 찾을 수 없습니다")

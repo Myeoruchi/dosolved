@@ -12,7 +12,7 @@ async def get_streak(session: ClientSession, account: str) -> dict | str:
     """
 
     try:
-        response = session.get(f"https://solved.ac/api/v3/user/grass?handle={account}&topic=default")
+        response = await session.get(f"https://solved.ac/api/v3/user/grass?handle={account}&topic=default")
         if response.status == 200:
             return await response.json()
         elif response.status == 404:
@@ -35,7 +35,7 @@ async def get_user(session: ClientSession, account: str) -> dict | str:
     """
 
     try:
-        response = session.get(f"https://solved.ac/api/v3/user/show?handle={account}")
+        response = await session.get(f"https://solved.ac/api/v3/user/show?handle={account}")
         if response.status == 200:
             return await response.json()
         elif response.status == 404:
@@ -58,7 +58,7 @@ async def get_background(session: ClientSession, id: str) -> dict | str:
     """
 
     try:
-        response = session.get(f"https://solved.ac/api/v3/background/show?backgroundId={id}")
+        response = await session.get(f"https://solved.ac/api/v3/background/show?backgroundId={id}")
         if response.status == 200:
             return await response.json()
         elif response.status == 404:

@@ -51,7 +51,7 @@ class Streak(commands.Cog):
         if isinstance(response, str):
             return await interaction.followup.send("오류가 발생했습니다. 다시 시도해주세요.")
         
-        background = response['backgroundImageUrl']
+        background = await response['backgroundImageUrl']
         streak_list = sorted(streak['grass'], key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d').date(), reverse=True)
         curStreak = streak['currentStreak']
         maxStreak = streak['longestStreak']

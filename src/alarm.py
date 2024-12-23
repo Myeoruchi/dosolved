@@ -111,7 +111,7 @@ class Alarm(commands.Cog):
                     for entry in streak_list:
                         if isinstance(entry['value'], int):
                             date = datetime.strptime(entry['date'], '%Y-%m-%d').date()
-                            if date == today and entry['value'] >= 1:
+                            if date == today:
                                 check = True
                             break
                     

@@ -63,16 +63,9 @@ class Streak(commands.Cog):
         for entry in streak_list:
             if isinstance(entry['value'], int):
                 date = datetime.strptime(entry['date'], '%Y-%m-%d').date()
-                if date == today and entry['value'] >= 1:
+                if date == today:
                     check = True
                 break
-        
-        if check:
-            data = await database.get_accounts()
-            id = str(interaction.user.id)
-            if id in data and not data[id]['today']:
-                data[id]['today'] = True
-                await database.write_accounts(data)
 
         async with aiofiles.open(f"./../resource/tier/{tier}.png", 'rb') as f:
             data = await f.read()

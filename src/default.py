@@ -30,9 +30,7 @@ class DefaultCommand(commands.Cog):
             icon_url=f"{self.bot.user.avatar}"
         )
         
-        # 명령어 보기 버튼 생성
         view = discord.ui.View()
-
         button = discord.ui.Button(
             label="명령어 목록 보기",
             style=discord.ButtonStyle.primary,
@@ -56,7 +54,7 @@ class DefaultCommand(commands.Cog):
         """봇의 명령어 목록을 보여주는 내부 메서드."""
         
         embed = discord.Embed(
-            color=0x7FFFD4,
+            colour=0x7FFFD4,
             title=f"{self.bot.user.name} 명령어 목록"
         )
         embed.add_field(name="/핑", value="봇의 응답속도를 알려줍니다.", inline=False)

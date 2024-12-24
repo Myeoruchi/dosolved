@@ -45,10 +45,12 @@ async def write_accounts(accounts: dict) -> None:
         print(f"Error occurred in write_accounts: {e}")
 
 async def generate_backup() -> None:
-    today = datetime.now(timezone(timedelta(hours=3))).date()
+    """계정 목록 파일을 백업하는 함수입니다."""
+
+    today = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
     path = f"{BACKUP_PATH + today}.json"
     if DB_PATH.is_file():
-        shutil.copy(DB_PATH, f"{BACKUP_PATH + today}.json")
+        shutil.copy(DB_PATH, path)
     else:
         async with aiofiles.open(path, 'w', encoding='utf8') as f:
             await f.write(json.dumps({}, indent=4, ensure_ascii=False))

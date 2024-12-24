@@ -47,22 +47,22 @@ class Streak(commands.Cog):
         streak = responses[0]
         user = responses[1]
 
-        response = api.get_background(self.bot.session, user['backgroundId'])
+        response = await api.get_background(self.bot.session, user['backgroundId'])
         if isinstance(response, str):
             return await interaction.followup.send("오류가 발생했습니다. 다시 시도해주세요.")
         
-        background = await response['backgroundImageUrl']
-        streak_list = sorted(streak['grass'], key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d').date(), reverse=True)
+        background = response['backgroundImageUrl']
+        streak_list = sorted(streak['grass'], key=lambda x: x['date'], reverse=True)
         curStreak = streak['currentStreak']
         maxStreak = streak['longestStreak']
         profile = user['profileImageUrl']
         tier = user['tier']
 
-        today = datetime.now(timezone(timedelta(hours=3))).date()
+        today = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
         check = False
         for entry in streak_list:
             if isinstance(entry['value'], int):
-                date = datetime.strptime(entry['date'], '%Y-%m-%d').date()
+                date = entry['date']
                 if date == today:
                     check = True
                 break

@@ -105,12 +105,12 @@ class Alarm(commands.Cog):
             if time in account['alarm']:
                 try:
                     streak = await api.get_streak(self.bot.session, account['account'])
-                    streak_list = sorted(streak['grass'], key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d').date(), reverse=True)
-                    today = datetime.now(timezone(timedelta(hours=3))).date()
+                    streak_list = sorted(streak['grass'], key=lambda x: x['date'], reverse=True)
+                    today = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
                     check = False
                     for entry in streak_list:
                         if isinstance(entry['value'], int):
-                            date = datetime.strptime(entry['date'], '%Y-%m-%d').date()
+                            date = entry['date']
                             if date == today:
                                 check = True
                             break
